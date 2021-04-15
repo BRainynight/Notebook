@@ -21,30 +21,46 @@ LR = 0.0005
 MODLE_NAME = "linear"
 pretrained = False 
 pretrained_weight_path = r""
+weightDir = "."
 
-def saveWeight(model, name=MODLE_NAME, weightDir="."):
+# check 
+if os.path.isdir(weightDir):
+    print("weightDir exists")
+else:
+    raise Exception(f" {os.path.abspath(weightDir)} , weightDir Not exists")
+
+if os.path.isdir(pretrained_weight_path):
+    print("pretrained weight exists")
+else:
+    raise Exception(f" {os.path.abspath(pretrained_weight_path)} , pretrained weight Not exists")
+
+def saveWeight(model, name=MODLE_NAME, weightDir=weightDir):
     path = os.path.join(weightDir, f"{name}.pth")
     torch.save(model.state_dict(), path)
 
 
-# define dataset and loder 
-dataset=Dataset()
+############################# dataset #############################
+dataset= Dataset() # """ !!!!!!!!!!!!!!!!!!!!! put your dataset """
 dataloader = DataLoader(dataset=dataset, batch_size=BATCHSIZE, shuffle=True)
 
 
-# model
-model = nn.Module() # some NN module your will train 
+############################# model #############################
+model = nn.Module()  # """ !!!!!!!!!!!!!!!!!!!!! some NN module your will train  """ 
 if pretrained:
     model.load_state_dict(torch.load(pretrained_weight_path))
     logger.info("Use pretrained model")
 
-# optimizer, and lossfinction
+model = model.to(device)
+###################### optimizer, and lossfinction ######################
+
 optimizer = torch.optim.Adam(model.parameters(), lr=LR)
 loss_func = nn.MSELoss()
 
 logger.info("Start to train")
 logger.info(f"total epoch is {EPOCH}, batch size {BATCHSIZE}, learning rate {LR}, model name {MODLE_NAME}")
 
+
+###################### training ######################
 for epoch in range(EPOCH):
     model.train()
     avg_loss = 0
