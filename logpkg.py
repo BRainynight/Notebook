@@ -1,5 +1,5 @@
-import logging
-def get_logger(rootName="__main__", child="", logfileName='record.log'):
+import logging, sys
+def get_logger(rootName="__main__", child="", logfileName="record"):
     '''
     直接使用 get_logger ，返回的 logger 不會有層級。
     1. 根據程式的 package 層級自動設定：要包括參數整行複製去用：get_logger(rootName="__main__", child=__name__)
@@ -12,11 +12,12 @@ def get_logger(rootName="__main__", child="", logfileName='record.log'):
         logName = rootName+"."+child
     print("Your Log name is ", logName)
     logger = logging.getLogger(logName) 
+    logger.setLevel(logging.DEBUG)
 
     # file handler
-    fh = logging.FileHandler(logfileName,mode='w')
+    fh = logging.FileHandler(logfileName+".log",mode='w')
     fh.setLevel(logging.INFO)
-    ch = logging.StreamHandler()
+    ch = logging.StreamHandler() # sys.stdout
     ch.setLevel(logging.DEBUG)
 
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s : %(message)s')
