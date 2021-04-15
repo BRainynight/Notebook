@@ -5,6 +5,9 @@ def get_logger(rootName="__main__", childName="", fileName="record", timeFlag=Fa
     1. 根據程式的 package 層級自動設定：要包括參數整行複製去用：get_logger(rootName="__main__", childName=__name__)
     2. 自定義層級：同時覆蓋 rootName, child 自己寫層級架構。get_logger(rootName="parent", childName="child1.child2)
     3. 不使用層級：rootName 可自由選擇是否更改，但 child 請設為空 get_logger(rootName="__main__", childName="")
+    # --------------------------------
+    如果有不只一個 python 檔在跑，且彼此沒有上下層級關係
+    記得覆寫 rootName，不要讓兩個 logger 同名，否則一旦輸入訊息會讓兩個 logger 都一起 ouput
     '''
     logName = rootName if not childName else  rootName+"."+childName
     print("Your Log name is : ", logName)
