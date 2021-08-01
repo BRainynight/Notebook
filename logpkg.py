@@ -18,20 +18,21 @@ def get_logger(rootName="__main__", childName="", fileName="record", timeFlag=Fa
         now = datetime.now()
         dt_string = now.strftime("%m%d_%H%M%S")
         fileName+="_"+dt_string
+        
+    if not childName: # 只能在最頂層加，如果每一層都這樣加，每一個 child logger 也會都 print 一行出來
+        # file handler
+        fh = logging.FileHandler(fileName+".log",mode='w')
+        fh.setLevel(logging.INFO)
+        ch = logging.StreamHandler() # sys.stdout
+        ch.setLevel(logging.DEBUG)
 
-    # file handler
-    fh = logging.FileHandler(fileName+".log",mode='w')
-    fh.setLevel(logging.INFO)
-    ch = logging.StreamHandler() # sys.stdout
-    ch.setLevel(logging.DEBUG)
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s : %(message)s')
+        ch.setFormatter(formatter)
+        fh.setFormatter(formatter)
 
-    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s : %(message)s')
-    ch.setFormatter(formatter)
-    fh.setFormatter(formatter)
-
-    # put filehandler into logger
-    logger.addHandler(fh)
-    logger.addHandler(ch)
+        # put filehandler into logger
+        logger.addHandler(fh)
+        logger.addHandler(ch)
 
     return logger
 logger = get_logger(timeFlag=True)
