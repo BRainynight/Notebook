@@ -19,6 +19,13 @@ def get_logger(rootName="__main__", childName="", fileName="", timeFlag=True, lo
         now = datetime.now()
         dt_string = now.strftime("%m%d_%H%M%S")
         fileName+="_"+dt_string
+        
+    if not childName: # 只能在最頂層加，如果每一層都這樣加，每一個 child logger 也會都 print 一行出來
+        # file handler
+        fh = logging.FileHandler(fileName+".log",mode='w', encoding='utf-8-sig')
+        fh.setLevel(logging.INFO)
+        ch = logging.StreamHandler() # sys.stdout
+        ch.setLevel(logging.DEBUG)
 
     if not os.path.isdir(log_dir):
         os.mkdir(log_dir)
@@ -32,8 +39,8 @@ def get_logger(rootName="__main__", childName="", fileName="", timeFlag=True, lo
         ch = logging.StreamHandler() # sys.stdout
         ch.setLevel(logging.DEBUG)
 
-        # formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s : %(message)s')
-        formatter = logging.Formatter('%(message)s')
+        formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s : %(message)s')
+        # formatter = logging.Formatter('%(message)s')
         ch.setFormatter(formatter)
         fh.setFormatter(formatter)
 
@@ -43,6 +50,6 @@ def get_logger(rootName="__main__", childName="", fileName="", timeFlag=True, lo
 
     return logger
 
-
+    
 if __name__=="__main__":
     logger = get_logger(timeFlag=True)
