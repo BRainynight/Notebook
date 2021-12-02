@@ -1,2 +1,8 @@
 # myPattern
-just some useful function
+
+這裡將會存放一些我喜歡的小工具，懶得每次重新寫，就一口氣放在這邊。
+
+- logging : 有一個好用的函式與把它綁定到 qt 輸出的方法
+
+  
+
