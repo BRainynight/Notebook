@@ -1,7 +1,13 @@
 import logging, sys, os
 from PyQt5 import QtCore, QtGui, QtWidgets
+from matplotlib.figure import Figure
+from PyQt5 import QtWidgets, QtCore
+from PyQt5.QtGui import QFont 
+from PyQt5.QtWidgets import *
+from logpkg import get_logger
 Signal = QtCore.pyqtSignal
 Slot = QtCore.pyqtSlot
+logger = get_logger(rootName="__main__", timeFlag=False, log_dir=".")
 
 # 把 logging 的內容放在 qt 的 textbrowser 之類的
 class Signaller(QtCore.QObject):
@@ -34,10 +40,66 @@ class QtHandler(logging.Handler):
         s = self.format(record)
         self.signaller.signal.emit(s, record)
 
-if __name__=="__main__":
-    class GUI:
-        def __init__(self) -> None:
-            h = QtHandler(self.update_browser)
-            self.handler = h
-            h.setFormatter(logging.Formatter('%(message)s'))
-            h.setLevel(logging.DEBUG)
+class Layout(QWidget):
+    html_format = {
+        logging.DEBUG: ("black", "1"),
+        logging.INFO: ("green", "1"),
+        logging.WARNING: ("blue", "2"),
+        logging.ERROR: ("red", "3"),
+        logging.CRITICAL: ("purple", "3"),
+    }
+    def __init__(self, *args, **kwargs):        
+        super().__init__(*args, **kwargs)
+        
+        self.count = 0 
+
+        grid = QGridLayout()
+
+
+        h = QtHandler(self.update_browser)
+        self.handler = h
+        h.setFormatter(logging.Formatter('%(message)s'))
+        h.setLevel(logging.DEBUG)
+        logger.addHandler(h)
+
+        self.browser = QTextBrowser(self)
+        self.browser.setFont(QFont('Times', 12))
+        self.browser.append("Open")
+
+        self.btn_add = QPushButton("Click!", self)
+        self.btn_add.clicked.connect(self.record)
+
+        self.btn_reset = QPushButton("Reset", self)
+        self.btn_reset.clicked.connect(self.reset)
+
+
+        grid.addWidget(self.browser, 0, 0) 
+        grid.addWidget(self.btn_add, 1, 0)
+        grid.addWidget(self.btn_reset, 1, 1)             
+        self.setLayout(grid)
+    
+    def record(self, ):
+        self.count += 1
+        logger.info(f"Click {self.count} times")
+
+    def reset(self, ):
+        self.count=0
+        logger.error(f"Reset")
+
+
+    @Slot(str, logging.LogRecord)
+    def update_browser(self, status, record):
+        (color, fontsize) = self.html_format.get(record.levelno, ("black", "12px"))
+        s = '<pre><font color="%s" size="%s">%s</font></pre>' % (color, fontsize, status)
+        # s = '<pre><font color="%s">%s</font></pre>' % (color, status)
+        self.browser.append(s)
+    
+
+
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    layout=Layout()
+
+    layout.show()
+    app.exec_()
